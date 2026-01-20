@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>機密檔案 (請勿開啟)</title>
+    <title>67 耐力測試</title>
     <style>
         body {
             margin: 0;
@@ -12,12 +12,10 @@
             font-family: 'Arial Black', sans-serif;
             overflow: hidden; 
             color: white;
-            user-select: none; /* 禁止選取文字，增加神秘感 */
+            user-select: none;
         }
 
-        /* ====================
-           第一階段：誘餌層 (The Hook)
-           ==================== */
+        /* 誘餌層 */
         #bait-layer {
             position: fixed;
             top: 0;
@@ -33,64 +31,58 @@
             cursor: pointer;
         }
 
-        /* 那個誘人的紅色按鈕 */
         .big-red-btn {
-            width: 200px;
-            height: 200px;
+            width: 180px;
+            height: 180px;
             background: radial-gradient(circle at 30% 30%, #ff4444, #990000);
             border-radius: 50%;
             border: 4px solid #330000;
-            box-shadow: 
-                0 10px 20px rgba(0,0,0,0.5),
-                0 0 50px rgba(255, 0, 0, 0.3); /* 紅色光暈 */
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.4);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 20px;
             text-align: center;
             color: white;
             text-transform: uppercase;
-            cursor: pointer;
             transition: transform 0.1s;
-            animation: heartbeat 2s infinite; /* 像心臟一樣跳動 */
+            animation: pulse 3s infinite;
         }
 
-        .big-red-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
-        }
-
-        .warning-text {
-            margin-top: 30px;
-            color: #666;
-            font-size: 14px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); box-shadow: 0 0 80px rgba(255, 0, 0, 0.6); }
-            100% { transform: scale(1); }
-        }
-
-        /* ====================
-           第二階段：遊戲介面
-           ==================== */
+        .big-red-btn:active { transform: scale(0.95); }
         
+        .warning-text { margin-top: 20px; color: #888; font-size: 12px; letter-spacing: 1px; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 30px rgba(255,0,0,0.4); }
+            50% { box-shadow: 0 0 60px rgba(255,0,0,0.8); }
+            100% { box-shadow: 0 0 30px rgba(255,0,0,0.4); }
+        }
+
+        /* 遊戲介面 - 計分板 */
         #timer-board {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 0, 0, 0.8);
-            border: 2px solid white;
-            padding: 10px 30px;
-            font-size: 24px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            padding: 10px 40px;
+            border-radius: 10px;
             z-index: 10001;
-            display: none; /* 初始隱藏 */
-            box-shadow: 0 0 20px red;
+            display: none;
             text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        #rank-badge {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 2px 8px;
+            background: #333;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #aaa;
         }
 
         /* 背景 GIF 牆 */
@@ -107,7 +99,7 @@
             z-index: 1;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.5s;
+            transition: opacity 1s;
         }
 
         .gif-item {
@@ -122,60 +114,57 @@
             position: absolute;
             width: 280px;
             background: #ffec00; 
-            border: 4px solid #ff0000;
-            box-shadow: 10px 10px 0px #000;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
             z-index: 9999;
             color: #000;
             padding: 0;
             display: flex;
             flex-direction: column;
             user-select: none;
-            animation: shakeUpAndDown 0.1s infinite;
+            /* 抖動幅度改小一點，沒那麼煩躁 */
+            animation: mildShake 0.2s infinite; 
         }
 
         .ad-header {
-            background: #ff0000;
+            background: #000;
             color: #fff;
             padding: 5px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 14px;
-            border-bottom: 2px solid #000;
+            font-size: 12px;
         }
 
-        .ad-body {
-            padding: 10px;
-            text-align: center;
-        }
+        .ad-body { padding: 10px; text-align: center; }
 
         .ad-image {
             width: 100%;
             height: 100px;
             object-fit: cover;
-            border: 2px solid #000;
+            border: 1px solid #000;
             margin-bottom: 5px;
             background: #fff;
         }
 
         .btn-fake {
-            background: #ff0000;
-            color: #ffff00;
-            border: 2px solid #000;
-            padding: 5px 15px;
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 20px;
             font-weight: bold;
             cursor: pointer;
             margin-top: 5px;
-            box-shadow: 2px 2px 0 #000;
         }
         
-        .btn-fake:active { transform: translate(1px, 1px); }
+        .btn-fake:hover { background: #ff0000; }
 
-        @keyframes shakeUpAndDown {
-            0%   { transform: translate(0, 0); }
-            25%  { transform: translate(-3px, -8px); }
-            50%  { transform: translate(0, 0); }
-            75%  { transform: translate(3px, 8px); }
+        @keyframes mildShake {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-1px, -1px); }
+            50% { transform: translate(0, 0); }
+            75% { transform: translate(1px, 1px); }
             100% { transform: translate(0, 0); }
         }
     </style>
@@ -184,24 +173,26 @@
 
     <div id="bait-layer" onclick="triggerChaos()">
         <div class="big-red-btn">
-            不要按<br>NO!
+            不要按<br>Start
         </div>
         <div class="warning-text">
-            ⚠️ 危險實驗 / DANGER 67 <br>
-            系統穩定中... 請勿觸碰
+            點擊後將開始 67 耐力測試<br>
+            你能撐多久?
         </div>
     </div>
 
     <div id="timer-board">
-        存活時間<br>
-        <span id="time-display" style="font-size: 40px; font-weight: bold;">0.0</span> 秒
+        <div style="font-size: 12px; color:#888;">TIME SURVIVED</div>
+        <span id="time-display" style="font-size: 36px; font-weight: bold; color: #0f0;">0.00</span>
+        <br>
+        <div id="rank-badge">評級: 菜鳥 (Normal)</div>
     </div>
 
     <div id="gif-container"></div>
 
     <script>
-        // 設定要賺錢的導流連結
-        const moneyLink = "https://www.google.com"; // 記得換成你的
+        // 設定導流連結
+        const moneyLink = "https://www.google.com"; 
 
         const userGifIds = [
             "x4sYb64AngRI9QznOA", "JiN5WlLgVpzR0807By", "ia0sMsvTBUQYb59SjK",
@@ -212,41 +203,56 @@
         const getGifUrl = (id) => `https://media.giphy.com/media/${id}/giphy.gif`;
 
         // ------------------------------------------
-        // 核心邏輯：誘發點擊 -> 啟動混亂
+        // 核心邏輯
         // ------------------------------------------
         let chaosStarted = false;
         let startTime = 0;
 
         function triggerChaos() {
-            if(chaosStarted) return; // 避免重複觸發
+            if(chaosStarted) return;
             chaosStarted = true;
 
-            // 1. 移除按鈕層
             const bait = document.getElementById('bait-layer');
-            bait.style.transition = "opacity 0.2s";
+            bait.style.transition = "opacity 0.3s";
             bait.style.opacity = "0";
-            setTimeout(() => bait.remove(), 200);
+            setTimeout(() => bait.remove(), 300);
 
-            // 2. 顯示背景與計時器
-            document.getElementById('gif-container').style.opacity = '0.5';
+            document.getElementById('gif-container').style.opacity = '0.4';
             const timerBoard = document.getElementById('timer-board');
             timerBoard.style.display = 'block';
 
-            // 3. 開始計時 (Gamification)
             startTime = Date.now();
-            setInterval(updateTimer, 100);
+            setInterval(updateTimer, 50);
 
-            // 4. 啟動廣告風暴
-            startAdStorm();
+            // 啟動廣告 (這裡會比較慢)
+            setTimeout(startAdStorm, 1000);
         }
 
+        // 更新計時器與評級系統 (Gamification)
         function updateTimer() {
             const now = Date.now();
             const diff = (now - startTime) / 1000;
-            document.getElementById('time-display').innerText = diff.toFixed(1);
+            const display = document.getElementById('time-display');
+            const rank = document.getElementById('rank-badge');
+
+            display.innerText = diff.toFixed(2);
+
+            // 根據存活時間改變顏色與評價
+            if (diff < 10) {
+                display.style.color = "#0f0"; // 綠色
+                rank.innerText = "評級: 菜鳥 (Easy)";
+            } else if (diff < 20) {
+                display.style.color = "#ff0"; // 黃色
+                rank.innerText = "評級: 一般 (Normal)";
+            } else if (diff < 40) {
+                display.style.color = "orange"; 
+                rank.innerText = "評級: 老手 (Hard)";
+            } else {
+                display.style.color = "red"; 
+                rank.innerText = "評級: 67之神 (CHAOS)";
+            }
         }
 
-        // --- 背景建立 ---
         function buildGifWall() {
             const container = document.getElementById('gif-container');
             let fullList = [];
@@ -260,7 +266,6 @@
             });
         }
 
-        // --- 廣告生成 ---
         function spawnAd() {
             const ad = document.createElement('div');
             ad.className = 'ad-popup';
@@ -277,13 +282,13 @@
 
             ad.innerHTML = `
                 <div class="ad-header">
-                    <span>⚠️ 錯誤 (67)</span>
-                    <div class="close-btn" style="cursor:pointer;" onclick="killAd(this)">X</div>
+                    <span>⚠️ 警告</span>
+                    <div class="close-btn" style="cursor:pointer; font-weight:bold;" onclick="killAd(this)">X</div>
                 </div>
                 <div class="ad-body">
                     <img src="${getGifUrl(randomGif)}" class="ad-image">
-                    <div>你的電腦正在 67 !</div>
-                    <button class="btn-fake" onclick="window.open('${moneyLink}', '_blank')">系統修復</button>
+                    <div>系統異常，請點擊修復</div>
+                    <button class="btn-fake" onclick="window.open('${moneyLink}', '_blank')">立即下載修復包</button>
                 </div>
             `;
             document.body.appendChild(ad);
@@ -294,14 +299,19 @@
             if(popup) popup.remove();
         }
 
-        // --- 加速控制器 ---
-        let currentInterval = 800; 
-        const minInterval = 100;    
-        const accelerationRate = 0.9; 
+        // --- 溫水煮青蛙加速器 ---
+        let currentInterval = 2500; // 初始速度：2.5秒才出一個 (很慢，讓使用者放鬆戒心)
+        const minInterval = 300;    // 最快極限：0.3秒 (不會卡死，但很難關)
+        const accelerationRate = 0.98; // 每次只快 2% (非常平滑的加速)
 
         function startAdStorm() {
             spawnAd(); 
+            
+            // 計算下次時間
             currentInterval = Math.max(minInterval, currentInterval * accelerationRate);
+            
+            console.log("Next ad in: " + currentInterval + "ms"); // 除錯用
+            
             setTimeout(startAdStorm, currentInterval);
         }
 
