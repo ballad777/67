@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>67 耐力測試</title>
+    <title>67 記憶體保衛戰</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             background-color: #000;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'Consolas', 'Arial', sans-serif;
             overflow: hidden; 
             color: white;
             user-select: none;
         }
 
-        /* 誘餌層 */
-        #bait-layer {
+        /* --- 1. 誘餌層 (開始畫面) --- */
+        #start-screen {
             position: fixed;
             top: 0;
             left: 0;
@@ -34,107 +34,157 @@
         .big-red-btn {
             width: 180px;
             height: 180px;
-            background: radial-gradient(circle at 30% 30%, #ff4444, #990000);
+            background: radial-gradient(circle at 30% 30%, #ff0000, #550000);
             border-radius: 50%;
-            border: 4px solid #330000;
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.4);
+            border: 5px solid #330000;
+            box-shadow: 0 0 40px #ff0000;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: 24px;
+            font-weight: bold;
             text-align: center;
             color: white;
-            text-transform: uppercase;
-            transition: transform 0.1s;
-            animation: pulse 3s infinite;
+            animation: pulse 2s infinite;
+            text-shadow: 2px 2px 0px black;
         }
-
-        .big-red-btn:active { transform: scale(0.95); }
         
-        .warning-text { margin-top: 20px; color: #888; font-size: 12px; letter-spacing: 1px; }
+        .best-score {
+            margin-top: 20px;
+            color: #ffff00;
+            font-size: 18px;
+            border: 1px solid #ffff00;
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 30px rgba(255,0,0,0.4); }
-            50% { box-shadow: 0 0 60px rgba(255,0,0,0.8); }
-            100% { box-shadow: 0 0 30px rgba(255,0,0,0.4); }
+            0% { transform: scale(1); box-shadow: 0 0 20px #ff0000; }
+            50% { transform: scale(1.05); box-shadow: 0 0 50px #ff0000; }
+            100% { transform: scale(1); box-shadow: 0 0 20px #ff0000; }
         }
 
-        /* 遊戲介面 - 計分板 */
-        #timer-board {
+        /* --- 2. 遊戲介面 (負載條) --- */
+        #game-ui {
+            display: none; /* 初始隱藏 */
+        }
+
+        #ram-bar-container {
             position: fixed;
-            top: 20px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: #222;
+            z-index: 15000;
+            border-bottom: 2px solid #555;
+            display: flex;
+            align-items: center;
+        }
+
+        #ram-label {
+            width: 120px;
+            padding-left: 10px;
+            font-size: 14px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        #ram-progress {
+            flex-grow: 1;
+            height: 100%;
+            background: #333;
+            position: relative;
+        }
+
+        #ram-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #0f0, #ff0, #f00);
+            transition: width 0.2s;
+        }
+        
+        #ram-percent {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            mix-blend-mode: difference;
+        }
+
+        /* 計時器 (移到底部，避免擋住) */
+        #timer-display {
+            position: fixed;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #444;
-            padding: 10px 40px;
-            border-radius: 10px;
-            z-index: 10001;
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px blue;
+            z-index: 10000;
+            pointer-events: none; /* 讓滑鼠可以穿透它點擊後面的東西 */
+        }
+
+        /* --- 3. 藍屏當機畫面 (Game Over) --- */
+        #bsod-screen {
             display: none;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-
-        #rank-badge {
-            display: inline-block;
-            margin-top: 5px;
-            padding: 2px 8px;
-            background: #333;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #aaa;
-        }
-
-        /* 背景 GIF 牆 */
-        #gif-container {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            grid-auto-rows: 180px;
-            gap: 2px;
-            z-index: 1;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 1s;
+            background: #0000aa; /* 經典藍 */
+            color: white;
+            z-index: 99999;
+            padding: 50px;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        .gif-item {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border: 1px solid #222;
-        }
-
-        /* 廣告視窗 */
+        /* --- 4. 廣告視窗 --- */
         .ad-popup {
             position: absolute;
-            width: 280px;
-            background: #ffec00; 
-            border: 3px solid #000;
+            width: 260px;
+            background: #e0e0e0; 
+            border: 2px solid #000;
             box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
             z-index: 9999;
             color: #000;
-            padding: 0;
             display: flex;
             flex-direction: column;
             user-select: none;
-            /* 抖動幅度改小一點，沒那麼煩躁 */
-            animation: mildShake 0.2s infinite; 
+            animation: popIn 0.2s;
         }
 
         .ad-header {
-            background: #000;
+            background: #000080; /* 深藍色標題列 */
             color: #fff;
-            padding: 5px 10px;
+            padding: 4px 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            width: 18px;
+            height: 18px;
+            background: #ccc;
+            color: black;
+            text-align: center;
+            line-height: 16px;
+            border: 1px solid white;
+            border-right-color: gray;
+            border-bottom-color: gray;
+            cursor: pointer;
             font-size: 12px;
         }
+        
+        .close-btn:active { border: 1px solid gray; }
 
         .ad-body { padding: 10px; text-align: center; }
 
@@ -142,57 +192,79 @@
             width: 100%;
             height: 100px;
             object-fit: cover;
-            border: 1px solid #000;
+            border: 1px inset #fff;
             margin-bottom: 5px;
-            background: #fff;
+            background: #000;
         }
 
         .btn-fake {
-            background: #ff4444;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 20px;
-            font-weight: bold;
+            background: #ddd;
+            border: 1px outset #fff;
+            padding: 5px 10px;
             cursor: pointer;
             margin-top: 5px;
+            font-size: 12px;
         }
-        
-        .btn-fake:hover { background: #ff0000; }
+        .btn-fake:active { border-style: inset; }
 
-        @keyframes mildShake {
-            0% { transform: translate(0, 0); }
-            25% { transform: translate(-1px, -1px); }
-            50% { transform: translate(0, 0); }
-            75% { transform: translate(1px, 1px); }
-            100% { transform: translate(0, 0); }
+        /* 背景牆 */
+        #gif-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-auto-rows: 150px;
+            gap: 0;
+            z-index: 1;
+            opacity: 0.3;
+            pointer-events: none;
         }
+        .gif-item { width: 100%; height: 100%; object-fit: cover; }
+
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div id="bait-layer" onclick="triggerChaos()">
-        <div class="big-red-btn">
-            不要按<br>Start
+    <div id="start-screen" onclick="startGame()">
+        <div class="big-red-btn">START<br>67</div>
+        <div style="margin-top:20px; text-align:center;">
+            任務：快速關閉視窗，別讓記憶體爆滿 (100%)<br>
+            <span style="font-size:12px; color:#888;">(點擊紅色按鈕開始)</span>
         </div>
-        <div class="warning-text">
-            點擊後將開始 67 耐力測試<br>
-            你能撐多久?
+        <div id="best-score-display" class="best-score" style="display:none;">
+            🏆 最高紀錄: 0.00 秒
         </div>
     </div>
 
-    <div id="timer-board">
-        <div style="font-size: 12px; color:#888;">TIME SURVIVED</div>
-        <span id="time-display" style="font-size: 36px; font-weight: bold; color: #0f0;">0.00</span>
-        <br>
-        <div id="rank-badge">評級: 菜鳥 (Normal)</div>
+    <div id="game-ui">
+        <div id="ram-bar-container">
+            <div id="ram-label">MEMORY (RAM)</div>
+            <div id="ram-progress">
+                <div id="ram-fill"></div>
+                <div id="ram-percent">0%</div>
+            </div>
+        </div>
+        <div id="timer-display">0.00</div>
     </div>
 
     <div id="gif-container"></div>
 
+    <div id="bsod-screen" onclick="location.reload()">
+        <h1>:(</h1>
+        <h2>Your device ran into a problem and needs to restart.</h2>
+        <br>
+        <p>Stop code: MEMORY_MANAGEMENT_67_ERROR</p>
+        <p>Your Score: <span id="final-score">0.00</span>s</p>
+        <br><br>
+        <div style="background:white; color:#0000aa; padding:5px; display:inline-block; font-weight:bold; cursor:pointer;">
+            [ 點擊畫面重新挑戰 ]
+        </div>
+    </div>
+
     <script>
         // 設定導流連結
-        const moneyLink = "https://www.google.com"; 
+        const moneyLink = "https://www.google.com"; // 換成你的
 
         const userGifIds = [
             "x4sYb64AngRI9QznOA", "JiN5WlLgVpzR0807By", "ia0sMsvTBUQYb59SjK",
@@ -202,57 +274,146 @@
         ];
         const getGifUrl = (id) => `https://media.giphy.com/media/${id}/giphy.gif`;
 
-        // ------------------------------------------
-        // 核心邏輯
-        // ------------------------------------------
-        let chaosStarted = false;
+        // ---------------- 遊戲變數 ----------------
+        let gameActive = false;
         let startTime = 0;
+        let memoryUsage = 0; // 0 ~ 100
+        let currentInterval = 2000;
+        let timerLoop;
+        let spawnLoop;
 
-        function triggerChaos() {
-            if(chaosStarted) return;
-            chaosStarted = true;
+        // ---------------- 0. 初始化與讀取紀錄 ----------------
+        window.onload = function() {
+            buildGifWall();
+            // 讀取最高分
+            const best = localStorage.getItem('bestTime_67');
+            if(best) {
+                const badge = document.getElementById('best-score-display');
+                badge.style.display = 'block';
+                badge.innerText = `🏆 最高紀錄: ${best} 秒`;
+            }
+        };
 
-            const bait = document.getElementById('bait-layer');
-            bait.style.transition = "opacity 0.3s";
-            bait.style.opacity = "0";
-            setTimeout(() => bait.remove(), 300);
+        // ---------------- 1. 開始遊戲 ----------------
+        function startGame() {
+            if(gameActive) return;
+            gameActive = true;
 
-            document.getElementById('gif-container').style.opacity = '0.4';
-            const timerBoard = document.getElementById('timer-board');
-            timerBoard.style.display = 'block';
+            // UI 切換
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'block';
 
+            // 啟動計時
             startTime = Date.now();
-            setInterval(updateTimer, 50);
+            timerLoop = setInterval(updateTimer, 50);
 
-            // 啟動廣告 (這裡會比較慢)
-            setTimeout(startAdStorm, 1000);
+            // 啟動廣告循環
+            spawnAdLoop();
         }
 
-        // 更新計時器與評級系統 (Gamification)
-        function updateTimer() {
-            const now = Date.now();
-            const diff = (now - startTime) / 1000;
-            const display = document.getElementById('time-display');
-            const rank = document.getElementById('rank-badge');
+        // ---------------- 2. 核心迴圈：生成廣告 ----------------
+        function spawnAdLoop() {
+            if(!gameActive) return;
 
-            display.innerText = diff.toFixed(2);
+            spawnAd();
 
-            // 根據存活時間改變顏色與評價
-            if (diff < 10) {
-                display.style.color = "#0f0"; // 綠色
-                rank.innerText = "評級: 菜鳥 (Easy)";
-            } else if (diff < 20) {
-                display.style.color = "#ff0"; // 黃色
-                rank.innerText = "評級: 一般 (Normal)";
-            } else if (diff < 40) {
-                display.style.color = "orange"; 
-                rank.innerText = "評級: 老手 (Hard)";
-            } else {
-                display.style.color = "red"; 
-                rank.innerText = "評級: 67之神 (CHAOS)";
+            // 加速機制 (越後面越快)
+            currentInterval = Math.max(300, currentInterval * 0.95); 
+            
+            spawnLoop = setTimeout(spawnAdLoop, currentInterval);
+        }
+
+        // ---------------- 3. 生成單一廣告 ----------------
+        function spawnAd() {
+            if(!gameActive) return;
+
+            // 增加記憶體負載 (懲罰)
+            increaseMemory(10); // 每個廣告增加 10%
+
+            const ad = document.createElement('div');
+            ad.className = 'ad-popup';
+            
+            // 隨機位置 (避開頂部 30px 的 Ram Bar)
+            const maxX = window.innerWidth - 280;
+            const maxY = window.innerHeight - 200; // 留點空間給底部計時器
+            const randomX = Math.max(0, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(40, Math.floor(Math.random() * maxY)); // Y 從 40 開始
+            
+            ad.style.left = randomX + 'px';
+            ad.style.top = randomY + 'px';
+
+            const randomGif = userGifIds[Math.floor(Math.random() * userGifIds.length)];
+
+            ad.innerHTML = `
+                <div class="ad-header">
+                    <span>System Error</span>
+                    <div class="close-btn" onclick="killAd(this)">X</div>
+                </div>
+                <div class="ad-body">
+                    <img src="${getGifUrl(randomGif)}" class="ad-image">
+                    <div>Memory leaking...</div>
+                    <button class="btn-fake" onclick="window.open('${moneyLink}', '_blank')">Fix Now</button>
+                </div>
+            `;
+            document.body.appendChild(ad);
+        }
+
+        // ---------------- 4. 關閉廣告 (玩家操作) ----------------
+        window.killAd = function(btn) {
+            if(!gameActive) return;
+            const popup = btn.closest('.ad-popup');
+            if(popup) {
+                popup.remove();
+                // 減少記憶體負載 (獎勵)
+                increaseMemory(-10); 
             }
         }
 
+        // ---------------- 5. 記憶體控制系統 ----------------
+        function increaseMemory(amount) {
+            memoryUsage += amount;
+            if(memoryUsage < 0) memoryUsage = 0;
+            
+            // 更新 UI
+            const fill = document.getElementById('ram-fill');
+            const percent = document.getElementById('ram-percent');
+            fill.style.width = memoryUsage + '%';
+            percent.innerText = memoryUsage + '%';
+
+            // 檢查是否爆表
+            if(memoryUsage >= 100) {
+                gameOver();
+            }
+        }
+
+        // ---------------- 6. 更新時間 ----------------
+        function updateTimer() {
+            const now = Date.now();
+            const diff = (now - startTime) / 1000;
+            document.getElementById('timer-display').innerText = diff.toFixed(2);
+        }
+
+        // ---------------- 7. 遊戲結束 (BSOD) ----------------
+        function gameOver() {
+            gameActive = false;
+            clearInterval(timerLoop);
+            clearTimeout(spawnLoop);
+
+            const finalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+
+            // 儲存紀錄
+            const currentBest = parseFloat(localStorage.getItem('bestTime_67') || 0);
+            if(parseFloat(finalTime) > currentBest) {
+                localStorage.setItem('bestTime_67', finalTime);
+            }
+
+            // 顯示藍屏
+            const bsod = document.getElementById('bsod-screen');
+            document.getElementById('final-score').innerText = finalTime;
+            bsod.style.display = 'block';
+        }
+
+        // Helper
         function buildGifWall() {
             const container = document.getElementById('gif-container');
             let fullList = [];
@@ -265,59 +426,6 @@
                 container.appendChild(img);
             });
         }
-
-        function spawnAd() {
-            const ad = document.createElement('div');
-            ad.className = 'ad-popup';
-            
-            const maxX = window.innerWidth - 300;
-            const maxY = window.innerHeight - 250;
-            const randomX = Math.max(0, Math.floor(Math.random() * maxX));
-            const randomY = Math.max(0, Math.floor(Math.random() * maxY));
-            
-            ad.style.left = randomX + 'px';
-            ad.style.top = randomY + 'px';
-
-            const randomGif = userGifIds[Math.floor(Math.random() * userGifIds.length)];
-
-            ad.innerHTML = `
-                <div class="ad-header">
-                    <span>⚠️ 警告</span>
-                    <div class="close-btn" style="cursor:pointer; font-weight:bold;" onclick="killAd(this)">X</div>
-                </div>
-                <div class="ad-body">
-                    <img src="${getGifUrl(randomGif)}" class="ad-image">
-                    <div>系統異常，請點擊修復</div>
-                    <button class="btn-fake" onclick="window.open('${moneyLink}', '_blank')">立即下載修復包</button>
-                </div>
-            `;
-            document.body.appendChild(ad);
-        }
-
-        window.killAd = function(btn) {
-            const popup = btn.closest('.ad-popup');
-            if(popup) popup.remove();
-        }
-
-        // --- 溫水煮青蛙加速器 ---
-        let currentInterval = 2500; // 初始速度：2.5秒才出一個 (很慢，讓使用者放鬆戒心)
-        const minInterval = 300;    // 最快極限：0.3秒 (不會卡死，但很難關)
-        const accelerationRate = 0.98; // 每次只快 2% (非常平滑的加速)
-
-        function startAdStorm() {
-            spawnAd(); 
-            
-            // 計算下次時間
-            currentInterval = Math.max(minInterval, currentInterval * accelerationRate);
-            
-            console.log("Next ad in: " + currentInterval + "ms"); // 除錯用
-            
-            setTimeout(startAdStorm, currentInterval);
-        }
-
-        window.onload = function() {
-            buildGifWall();
-        };
     </script>
 </body>
 </html>
